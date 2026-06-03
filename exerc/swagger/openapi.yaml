@@ -1,0 +1,177 @@
+openapi: 3.0.3
+info:
+  title: Registro de Gastos Pessoais
+  version: 1.0.0
+  description: API para gerenciamento de gastos pessoais com categorização.
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /expenses:
+    post:
+      summary: Criar gasto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExpenseRequest'
+      responses:
+        '201':
+          description: Gasto criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    get:
+      summary: Listar gastos
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/ExpenseCategory'
+      responses:
+        '200':
+          description: Lista de gastos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /expenses/{id}:
+    get:
+      summary: Buscar gasto por ID
+      parameters:
+        - $ref: '#/components/parameters/ExpenseId'
+      responses:
+        '200':
+          description: Gasto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      summary: Atualizar gasto
+      parameters:
+        - $ref: '#/components/parameters/ExpenseId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExpenseRequest'
+      responses:
+        '200':
+          description: Gasto atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Deletar gasto
+      parameters:
+        - $ref: '#/components/parameters/ExpenseId'
+      responses:
+        '204':
+          description: Gasto deletado
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    ExpenseId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    ExpenseCategory:
+      type: string
+      enum: [alimentacao, transporte, saude, educacao, outro]
+
+    Expense:
+      type: object
+      properties:
+        id:
+          type: integer
+        description:
+          type: string
+          minLength: 3
+        amount:
+          type: number
+          format: float
+          minimum: 0.01
+        category:
+          $ref: '#/components/schemas/ExpenseCategory'
+        date:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    CreateExpenseRequest:
+      type: object
+      required: [description, amount, category]
+      properties:
+        description:
+          type: string
+          minLength: 3
+        amount:
+          type: number
+          format: float
+          minimum: 0.01
+        category:
+          $ref: '#/components/schemas/ExpenseCategory'
+
+    UpdateExpenseRequest:
+      type: object
+      properties:
+        description:
+          type: string
+          minLength: 3
+        amount:
+          type: number
+          format: float
+          minimum: 0.01
+        category:
+          $ref: '#/components/schemas/ExpenseCategory'
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Requisição inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
