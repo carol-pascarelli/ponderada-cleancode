@@ -44,11 +44,14 @@ func setupRouter(figurinhaHandler *handler.FigurinhaHandler) *gin.Engine {
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "API de figurinhas funcionando",
-			"routes":  []string{"POST /figurinha", "GET /figurinha", "GET /figurinha/:id", "PUT /figurinha/:id", "DELETE /figurinha/:id"},
+			"routes": []string{
+				"POST /figurinha",
+				"GET /figurinha",
+				"GET /figurinha/:id",
+				"PUT /figurinha/:id",
+				"DELETE /figurinha/:id",
+			},
 		})
-	})
-	r.GET("/favicon.ico", func(c *gin.Context) {
-		c.Status(204)
 	})
 	figurinhas := r.Group("/figurinha")
 	{
