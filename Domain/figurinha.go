@@ -43,4 +43,3 @@ type UpdateFigurinhaRequest struct {
 	Tipo string `json:"tipo"`
 	Posicao string `json:"posicao"`
 }
-
